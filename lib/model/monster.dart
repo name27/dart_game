@@ -1,7 +1,8 @@
 import 'dart:io';
 import 'dart:math';
 
-import 'package:dart_game/model/abstract.dart';
+import 'package:dart_game/model/unit.dart';
+import 'package:dart_game/utils/io_util.dart';
 
 class Monster extends Unit {
   //   - 이름 (`String`)
@@ -20,8 +21,8 @@ class Monster extends Unit {
   static Future<List<Monster>> loadMonsterStats() async {
     try {
       List<Monster> monsters = [];
-      final file = File('lib/utils/monsters.txt');
-      final lines = await file.readAsStringSync();
+      final file = File('assets/monsters.txt');
+      final lines = await file.readAsString();
       for (final line in lines.split('\n')) {
         final parts = line.split(',');
         if (parts.length != 3) {
@@ -41,7 +42,7 @@ class Monster extends Unit {
       }
       return monsters;
     } catch (e) {
-      print('몬스터 데이터를 불러오는 데 실패했습니다: $e');
+      printError('몬스터 데이터를 불러오는 데 실패했습니다: $e');
       exit(1);
     }
   }
@@ -52,8 +53,10 @@ class Monster extends Unit {
     //캐릭터에게 입히는 데미지는 몬스터의 공격력에서 캐릭터의 방어력을 뺀 값이며, 최소 데미지는 0 이상입니다.
     final random = Random();
     int randomAttack = attack > 0 ? random.nextInt(attack) : 0;
+
     int damage = randomAttack - target.defense;
     if (damage < 0) damage = 0;
+
     target.health -= damage;
     print("\n$name의 턴");
     print("$name이(가) ${target.name}에게 $randomAttack 데미지를 입혔습니다.\n");

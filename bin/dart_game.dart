@@ -12,5 +12,5 @@ Future<void> main() async {
 
   print("\n게임을 시작합니다!");
   character.showStatus();
-  game.startGame(game.getRandomMonster());
+  await game.startGame(game.getRandomMonster());
 }
