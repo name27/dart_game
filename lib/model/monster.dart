@@ -1,0 +1,63 @@
+import 'dart:io';
+import 'dart:math';
+
+import 'package:dart_game/model/character.dart';
+
+class Monster {
+  //   - 이름 (`String`)
+  // - 체력 (`int`)
+  // - 랜덤으로 지정할 공격력 범위 최대값 (`int`)
+  // → 몬스터의 공격력은 캐릭터의 방어력보다 작을 수 없습니다. 랜덤으로 지정하여 캐릭터의 방어력과 랜덤 값 중 최대값으로 설정해주세요.
+  // - 방어력(`int`) = 0
+  // → 몬스터의 방어력은 0이라고 가정합니다.
+  final String name;
+  int health;
+  final int maxAttack;
+  int defense;
+
+  Monster({required this.name, required this.health, required this.maxAttack})
+    : defense = 0;
+
+  static Future<List<Monster>> loadMonsterStats() async {
+    try {
+      List<Monster> monsters = [];
+      final file = File('lib/utils/monsters.txt');
+      final lines = await file.readAsStringSync();
+      for (final line in lines.split('\n')) {
+        final parts = line.split(',');
+        if (parts.length != 3) {
+          throw FormatException('Invalid character data in line: $line');
+        }
+
+        final name = parts[0];
+        final health = int.parse(parts[1]);
+        final maxAttack = int.parse(parts[2]);
+        Monster monster = Monster(
+          name: name,
+          health: health,
+          maxAttack: maxAttack,
+        );
+        monsters.add(monster);
+      }
+      return monsters;
+    } catch (e) {
+      print('몬스터 데이터를 불러오는 데 실패했습니다: $e');
+      exit(1);
+    }
+  }
+
+  attackCharacter(Character character) {
+    //캐릭터에게 공격을 가하여 피해를 입힙니다.
+    //캐릭터에게 입히는 데미지는 몬스터의 공격력에서 캐릭터의 방어력을 뺀 값이며, 최소 데미지는 0 이상입니다.
+    final random = Random();
+    int attack = random.nextInt(maxAttack);
+    character.health -= (attack - character.defense);
+    print("\n$name의 턴");
+    print("$name이(가) ${character.name}에게 $attack의 데미지를 입혔습니다.\n");
+  }
+
+  showStatus() {
+    //몬스터의 현재 체력과 공격력을 매 턴마다 출력합니다.
+    print("$name - 체력: $health, 공격력: $maxAttack");
+  }
+}
