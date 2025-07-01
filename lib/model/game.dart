@@ -55,7 +55,7 @@ class Game {
     while (true) {
       String? continueYesNo = stdin.readLineSync() ?? '';
       if (continueYesNo == 'y' || continueYesNo == 'Y') {
-        print("\n새로운 몬스터가 나타났습니다!");
+        print("\n!!!!!!!새로운 몬스터가 나타났습니다!!!!!!!!");
         final random = Random();
         monster = monsters[random.nextInt(monsters.length)];
         monster.showStatus();
@@ -100,7 +100,7 @@ class Game {
     while (true) {
       String? action = stdin.readLineSync() ?? '';
       if (action == '1') {
-        character.attackMonster(monster);
+        character.attackTarget(monster);
         break;
       } else if (action == '2') {
         character.characterDefend();
@@ -111,7 +111,7 @@ class Game {
     }
 
     //몬스터 공격 턴 시작
-    monster.attackCharacter(character);
+    monster.attackTarget(character);
 
     if (monster.health <= 0) {
       monsters.remove(monster);
@@ -122,7 +122,7 @@ class Game {
 
   Monster getRandomMonster() {
     //Random() 을 사용하여 몬스터 리스트에서 랜덤으로 몬스터를 반환하여 대결합니다.
-    print("\n!!!!!!!!새로운 몬스터가 나타났습니다!!!!!!!!");
+    print("\n!!!!!!새로운 몬스터가 나타났습니다!!!!!!");
     final random = Random();
     Monster randomMonster = monsters[random.nextInt(monsters.length)];
 

@@ -1,22 +1,21 @@
 import 'dart:io';
 import 'dart:math';
 
-import 'package:dart_game/model/character.dart';
+import 'package:dart_game/model/abstract.dart';
 
-class Monster {
+class Monster extends Unit {
   //   - 이름 (`String`)
   // - 체력 (`int`)
   // - 랜덤으로 지정할 공격력 범위 최대값 (`int`)
   // → 몬스터의 공격력은 캐릭터의 방어력보다 작을 수 없습니다. 랜덤으로 지정하여 캐릭터의 방어력과 랜덤 값 중 최대값으로 설정해주세요.
   // - 방어력(`int`) = 0
   // → 몬스터의 방어력은 0이라고 가정합니다.
-  final String name;
-  int health;
-  final int maxAttack;
-  int defense;
-
-  Monster({required this.name, required this.health, required this.maxAttack})
-    : defense = 0;
+  Monster({
+    required super.name,
+    required super.health,
+    required super.attack,
+    required int defense,
+  }) : super(defense: 0);
 
   static Future<List<Monster>> loadMonsterStats() async {
     try {
@@ -35,7 +34,8 @@ class Monster {
         Monster monster = Monster(
           name: name,
           health: health,
-          maxAttack: maxAttack,
+          attack: maxAttack,
+          defense: 0,
         );
         monsters.add(monster);
       }
@@ -46,18 +46,16 @@ class Monster {
     }
   }
 
-  attackCharacter(Character character) {
+  @override
+  void attackTarget(Unit target) {
     //캐릭터에게 공격을 가하여 피해를 입힙니다.
     //캐릭터에게 입히는 데미지는 몬스터의 공격력에서 캐릭터의 방어력을 뺀 값이며, 최소 데미지는 0 이상입니다.
     final random = Random();
-    int attack = random.nextInt(maxAttack);
-    character.health -= (attack - character.defense);
+    int randomAttack = attack > 0 ? random.nextInt(attack) : 0;
+    int damage = randomAttack - target.defense;
+    if (damage < 0) damage = 0;
+    target.health -= damage;
     print("\n$name의 턴");
-    print("$name이(가) ${character.name}에게 $attack의 데미지를 입혔습니다.\n");
-  }
-
-  showStatus() {
-    //몬스터의 현재 체력과 공격력을 매 턴마다 출력합니다.
-    print("$name - 체력: $health, 공격력: $maxAttack");
+    print("$name이(가) ${target.name}에게 $randomAttack 데미지를 입혔습니다.\n");
   }
 }

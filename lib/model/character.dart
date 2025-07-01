@@ -1,18 +1,14 @@
 import 'dart:io';
 
+import 'package:dart_game/model/abstract.dart';
 import 'package:dart_game/model/monster.dart';
 
-class Character {
-  final String name;
-  int health;
-  int attack;
-  int defense;
-
+class Character extends Unit {
   Character({
-    required this.name,
-    required this.health,
-    required this.attack,
-    required this.defense,
+    required super.name,
+    required super.health,
+    required super.attack,
+    required super.defense,
   });
 
   static Future<Character> loadCharacterStats() async {
@@ -53,20 +49,18 @@ class Character {
     }
   }
 
-  attackMonster(Monster monster) {
-    //몬스터의 체력을 공격력만큼 감소시킵니다.
-    monster.health -= attack;
-    print("${name}이(가) ${monster.name}에게 ${attack}의 데미지를 입혔습니다.\n");
+  @override
+  void attackTarget(Unit target) {
+    // target이 Monster일 때만 공격
+    if (target is Monster) {
+      target.health -= attack;
+      print("${name}이(가) ${target.name}에게 ${attack}의 데미지를 입혔습니다.\n");
+    }
   }
 
   characterDefend() {
     //방어력만큼 체력을 회복합니다.
     health += defense;
     print("${name}이(가) 방어 태세를 취하여 ${defense} 만큼 체력을 얻었습니다.\n");
-  }
-
-  showStatus() {
-    //캐릭터의 현재 체력, 공격력, 방어력을 매 턴마다 출력합니다.
-    print("${name} - 체력: ${health}, 공격력: ${attack}, 방어력: ${defense}");
   }
 }
