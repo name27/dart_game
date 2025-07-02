@@ -6,6 +6,10 @@ import 'package:dart_game/model/monster.dart';
 import 'package:dart_game/utils/io_util.dart';
 
 class Character extends Unit {
+  static const double healthBuffChance = 0.3;
+  static const int healthBuffAmount = 10;
+  static const int attackBuffAmount = 10;
+
   bool isItemUsed;
 
   Character({
@@ -16,6 +20,7 @@ class Character extends Unit {
     this.isItemUsed = false,
   });
 
+  //캐릭터 데이터 불러오기
   static Future<Character> loadCharacterStats() async {
     try {
       final file = File('assets/characters.txt');
@@ -41,6 +46,7 @@ class Character extends Unit {
     }
   }
 
+  //캐릭터 이름 입력, 검증
   static Future<String> getCharacterName() async {
     return await promptInput(
       '캐릭터 이름을 입력하세요',
@@ -54,31 +60,35 @@ class Character extends Unit {
     );
   }
 
+  // Monster만 공격할 수 있도록 메서드 시그니처 변경
+  void attackMonster(Monster monster) {
+    int damage = calculateDamage(attack, monster.defense);
+    monster.takeDamage(damage);
+    print("$name이(가) ${monster.name}에게 $damage의 데미지를 입혔습니다.\n");
+  }
+
+  // Unit 클래스의 attackTarget 메서드 오버라이드 (타입 안전성을 위해)
   @override
   void attackTarget(Unit target) {
-    // target이 Monster일 때만 공격
     if (target is Monster) {
-      //캐릭터가 캐릭터를 공격하지 않게 확인 작업 ㄷㄷ
-      int damage = (attack - target.defense) < 0
-          ? 0
-          : (attack - target.defense);
-      target.health -= damage;
-      print("$name이(가) ${target.name}에게 $damage의 데미지를 입혔습니다.\n");
+      attackMonster(target);
+    } else {
+      print("캐릭터는 몬스터만 공격할 수 있습니다.");
     }
   }
 
   characterDefend() {
-    //방어력만큼 체력을 회복합니다.
-    health += defense;
+    //방어력만큼 체력을 회복
+    heal(defense);
     print("$name이(가) 방어 태세를 취하여 $defense 만큼 체력을 얻었습니다.");
   }
 
-  //30% 확률로 캐릭터의 health를 10 증가시킵니다
+  //30% 확률로 캐릭터의 health를 10 증가
   void healthBuff() {
     Random random = Random();
     double chance = random.nextDouble();
-    if (chance < 0.3) {
-      health += 10;
+    if (chance < healthBuffChance) {
+      heal(healthBuffAmount);
       print("\n[보너스 체력을 얻었습니다! 현재 체력: $health]");
     }
   }
@@ -86,7 +96,7 @@ class Character extends Unit {
   //공격력 버프
   void attackBuff() {
     if (!isItemUsed) {
-      attack += 10;
+      attack += attackBuffAmount;
       print("한 턴 동안 공격력 버프를 얻었습니다! 현재 공격력: $attack");
       isItemUsed = true;
     }
@@ -95,7 +105,7 @@ class Character extends Unit {
   //공격력 너프
   void attackDebuff() {
     if (isItemUsed) {
-      attack -= 10;
+      attack -= attackBuffAmount;
     }
   }
 }

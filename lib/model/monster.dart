@@ -6,6 +6,10 @@ import 'package:dart_game/model/unit.dart';
 import 'package:dart_game/utils/io_util.dart';
 
 class Monster extends Unit {
+  static const double defenseDebuffChance = 0.3;
+
+  final int maxAttack;
+
   //   - 이름 (`String`)
   // - 체력 (`int`)
   // - 랜덤으로 지정할 공격력 범위 최대값 (`int`)
@@ -16,7 +20,7 @@ class Monster extends Unit {
     required super.name,
     required super.health,
     required super.attack,
-    required int defense,
+    required this.maxAttack,
   }) : super(defense: 0);
 
   static Future<List<Monster>> loadMonsterStats() async {
@@ -25,19 +29,21 @@ class Monster extends Unit {
       final file = File('assets/monsters.txt');
       final lines = await file.readAsString();
       for (final line in lines.split('\n')) {
+        if (line.trim().isEmpty) continue;
         final parts = line.split(',');
         if (parts.length != 3) {
-          throw FormatException('Invalid character data in line: $line');
+          throw FormatException('Invalid monster data in line: $line');
         }
 
         final name = parts[0];
         final health = int.parse(parts[1]);
         final maxAttack = int.parse(parts[2]);
+
         Monster monster = Monster(
           name: name,
           health: health,
-          attack: maxAttack,
-          defense: 0,
+          attack: maxAttack, // 초기 공격력은 maxAttack으로 설정
+          maxAttack: maxAttack,
         );
         monsters.add(monster);
       }
@@ -50,15 +56,11 @@ class Monster extends Unit {
 
   @override
   void attackTarget(Unit target) {
-    //캐릭터에게 공격을 가하여 피해를 입힙니다.
-    //캐릭터에게 입히는 데미지는 몬스터의 공격력에서 캐릭터의 방어력을 뺀 값이며, 최소 데미지는 0 이상입니다.
     final random = Random();
-    int randomAttack = attack > 0 ? random.nextInt(attack) : 0;
+    int randomAttack = maxAttack > 0 ? random.nextInt(maxAttack) + 1 : 1;
 
-    int damage = (randomAttack - target.defense) < 0
-        ? 0
-        : (randomAttack - target.defense);
-    target.health -= damage;
+    int damage = calculateDamage(randomAttack, target.defense);
+    target.takeDamage(damage);
     print("\n[$name의 턴]");
     print("$name이(가) ${target.name}에게 $damage 데미지를 입혔습니다.\n");
   }
@@ -67,7 +69,7 @@ class Monster extends Unit {
   bool defenseDebuff(Character character) {
     Random random = Random();
     double chance = random.nextDouble();
-    if (chance < 0.3) {
+    if (chance < defenseDebuffChance) {
       character.defense = 0;
       print("\n[한 턴 동안 $name이(가) 방어력을 무력화시켰습니다! 현재 방어력: ${character.defense}]");
       return true;
