@@ -5,9 +5,10 @@ Future<bool> promptYesNo(String message) async {
   while (true) {
     stdout.write('$message (y/n): ');
     String? input = stdin.readLineSync();
-    if (input == null) continue;
-    if (input.toLowerCase() == 'y') return true;
-    if (input.toLowerCase() == 'n') return false;
+    if (input != null) {
+      if (input.toLowerCase() == 'y') return true;
+      if (input.toLowerCase() == 'n') return false;
+    }
     print('잘못 입력하셨습니다. 다시 입력해주세요.');
   }
 }

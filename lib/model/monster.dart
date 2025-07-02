@@ -1,6 +1,7 @@
 import 'dart:io';
 import 'dart:math';
 
+import 'package:dart_game/model/character.dart';
 import 'package:dart_game/model/unit.dart';
 import 'package:dart_game/utils/io_util.dart';
 
@@ -54,11 +55,23 @@ class Monster extends Unit {
     final random = Random();
     int randomAttack = attack > 0 ? random.nextInt(attack) : 0;
 
-    int damage = randomAttack - target.defense;
-    if (damage < 0) damage = 0;
-
+    int damage = (randomAttack - target.defense) < 0
+        ? 0
+        : (randomAttack - target.defense);
     target.health -= damage;
-    print("\n$name의 턴");
-    print("$name이(가) ${target.name}에게 $randomAttack 데미지를 입혔습니다.\n");
+    print("\n[$name의 턴]");
+    print("$name이(가) ${target.name}에게 $damage 데미지를 입혔습니다.\n");
+  }
+
+  //캐릭터 방어력 너프
+  bool defenseDebuff(Character character) {
+    Random random = Random();
+    double chance = random.nextDouble();
+    if (chance < 0.3) {
+      character.defense = 0;
+      print("\n[한 턴 동안 $name이(가) 방어력을 무력화시켰습니다! 현재 방어력: ${character.defense}]");
+      return true;
+    }
+    return false;
   }
 }

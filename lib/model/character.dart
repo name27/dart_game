@@ -1,15 +1,19 @@
 import 'dart:io';
+import 'dart:math';
 
 import 'package:dart_game/model/unit.dart';
 import 'package:dart_game/model/monster.dart';
 import 'package:dart_game/utils/io_util.dart';
 
 class Character extends Unit {
+  bool isItemUsed;
+
   Character({
     required super.name,
     required super.health,
     required super.attack,
     required super.defense,
+    this.isItemUsed = false,
   });
 
   static Future<Character> loadCharacterStats() async {
@@ -55,14 +59,43 @@ class Character extends Unit {
     // target이 Monster일 때만 공격
     if (target is Monster) {
       //캐릭터가 캐릭터를 공격하지 않게 확인 작업 ㄷㄷ
-      target.health -= attack;
-      print("${name}이(가) ${target.name}에게 ${attack}의 데미지를 입혔습니다.\n");
+      int damage = (attack - target.defense) < 0
+          ? 0
+          : (attack - target.defense);
+      target.health -= damage;
+      print("$name이(가) ${target.name}에게 $damage의 데미지를 입혔습니다.\n");
     }
   }
 
   characterDefend() {
     //방어력만큼 체력을 회복합니다.
     health += defense;
-    print("${name}이(가) 방어 태세를 취하여 ${defense} 만큼 체력을 얻었습니다.");
+    print("$name이(가) 방어 태세를 취하여 $defense 만큼 체력을 얻었습니다.");
+  }
+
+  //30% 확률로 캐릭터의 health를 10 증가시킵니다
+  void healthBuff() {
+    Random random = Random();
+    double chance = random.nextDouble();
+    if (chance < 0.3) {
+      health += 10;
+      print("\n[보너스 체력을 얻었습니다! 현재 체력: $health]");
+    }
+  }
+
+  //공격력 버프
+  void attackBuff() {
+    if (!isItemUsed) {
+      attack += 10;
+      print("한 턴 동안 공격력 버프를 얻었습니다! 현재 공격력: $attack");
+      isItemUsed = true;
+    }
+  }
+
+  //공격력 너프
+  void attackDebuff() {
+    if (isItemUsed) {
+      attack -= 10;
+    }
   }
 }

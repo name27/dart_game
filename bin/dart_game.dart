@@ -10,7 +10,8 @@ Future<void> main() async {
     defeatedMonsters: 0,
   );
 
-  print("\n게임을 시작합니다!");
+  print("\n[게임을 시작합니다!]");
   character.showStatus();
+  character.healthBuff();
   await game.startGame(game.getRandomMonster());
 }
