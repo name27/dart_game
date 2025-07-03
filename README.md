@@ -13,7 +13,7 @@ dart_game/
   bin/
     dart_game.dart         # 메인 실행 파일
   lib/
-    model/                 # 게임 주요 클래스 (Character, Monster, Game 등)
+    model/                 # 게임 주요 클래스 (Character, Monster, Game, Unit 등)
     utils/
       io_util.dart         # 입출력/유효성 검사 유틸 함수
   assets/
