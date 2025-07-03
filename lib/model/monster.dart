@@ -60,7 +60,6 @@ class Monster extends Unit {
     int randomAttack = maxAttack > 0 ? random.nextInt(maxAttack) + 1 : 1;
 
     int damage = calculateDamage(randomAttack, target.defense);
-    damage = max(damage, target.defense);
     target.takeDamage(damage);
     print("\n[$name의 턴]");
     print("$name이(가) ${target.name}에게 $damage 데미지를 입혔습니다.\n");

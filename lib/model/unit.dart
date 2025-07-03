@@ -18,7 +18,7 @@ abstract class Unit {
   // 데미지 계산 메서드
   int calculateDamage(int attackerAttack, int targetDefense) {
     int damage = (attackerAttack - targetDefense);
-    return damage > 0 ? damage : 0;
+    return damage > targetDefense ? damage : targetDefense;
   }
 
   // 체력이 0 이하인지 확인
